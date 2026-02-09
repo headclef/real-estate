@@ -1,66 +1,36 @@
-
 # Real Estate
 
-This repository is a placeholder for the Real Estate project.
+This repository contains the Real Estate project domain and services.
 
-Status: Temporary README — updated to include domain entities and relationships.
+Status: Initial scaffold — update later with setup and usage details.
 
-## Purpose
-Provide a concise mapping of the domain entities currently present in the codebase and describe their relationships so other contributors can quickly understand the data model.
+Planned updates:
+- Project description
+- Development setup and prerequisites
+- Build and run instructions
+- Configuration (appsettings, secrets)
 
-## Common base
-- `BaseEntity` (in `Core/Realestate.Domain/Entities/Commons/BaseEntity.cs`): `Id`, `IsDeleted`, `CreatedAt`, `UpdatedAt`.
+## Entity Mapping
 
-## Entities
-- `Country` — `Name, IsoTwo, IsoThree, IsoNumber, Cctld, Plate, Currency`
-- `DivisionType` — `Name`
-- `Division` — `Name, Code, CountryId, DivisionTypeId, ParentId`
-- `EstateType` — `Name`
-- `EstateStatus` — `Name`
-- `Estate` — `Name, Description, Price, CountryId, ParentDivisionId, ChildDivisionId?, EstateTypeId, EstateStatusId`
-- `StaffRole` — `Name`
-- `Staff` — `Name, Surname, FullName (computed), Code, Email, PhoneNumber, StaffRoleId`
+- **BaseEntity**: `Id` (int), `IsDeleted` (bool), `CreatedAt` (DateTime), `UpdatedAt` (DateTime?) — base for all entities. See Core/Realestate.Domain/Entities/Commons/BaseEntity.cs
 
-## Relationships (plain English)
-- A `Country` contains many `Division`s; an `Estate` also belongs to a `Country`.
-- `Division` is typed by `DivisionType` (each Division has one DivisionType).
-- `Division` can have a parent `Division` (self-referencing hierarchical divisions via `ParentId`).
-- An `Estate` is located within divisions via `ParentDivisionId` and optionally `ChildDivisionId` (estates reference division(s)).
-- `Estate` references `EstateType` and `EstateStatus` (type and status lookup tables).
-- `Staff` belongs to a `StaffRole` (via `StaffRoleId`).
+- **Estate**: `Name`, `Description`, `Price` (decimal), `DivisionId`, `EstateTypeId`, `EstateStatusId`.
+	- Navigation: `Division`, `EstateType`, `EstateStatus`.
+	- FK: `DivisionId` -> `Division.Id`, `EstateTypeId` -> `EstateType.Id`, `EstateStatusId` -> `EstateStatus.Id`.
 
-## Relationships (adjacency list)
-- Country -> Divisions, Estates
-- DivisionType -> Divisions
-- Division -> (Parent Division), Estates
-- EstateType -> Estates
-- EstateStatus -> Estates
-- StaffRole -> Staff
+- **Division**: `Name`, `Code`, `CountryId`, `DivisionTypeId`, `ParentId?`.
+	- Navigation: `Country`, `DivisionType`, `ParentDivision` (self-reference).
+	- FK: `CountryId` -> `Country.Id`, `DivisionTypeId` -> `DivisionType.Id`, `ParentId` -> `Division.Id`.
 
-## Simple diagram (Mermaid)
-If you use a renderer that supports Mermaid, this shows the core relations:
+- **Staff**: `Name`, `Surname`, computed `FullName`, `Code`, `Email`, `PhoneNumber`, `StaffRoleId`.
+	- Navigation: `StaffRole`.
+	- FK: `StaffRoleId` -> `StaffRole.Id`.
 
-```mermaid
-classDiagram
-	Country <|-- Division
-	Division "1" o-- "*" Division : parent
-	Division "1" <-- "*" Estate : located_in
-	Country "1" <-- "*" Estate : country
-	EstateType <|-- Estate
-	EstateStatus <|-- Estate
-	StaffRole <|-- Staff
+- **DivisionType**: `Name`.
+- **Country**: `Name`, `IsoTwo`, `IsoThree`, `IsoNumber`, `Cctld`, `Plate`, `Currency`.
+- **EstateType**: `Name`.
+- **EstateStatus**: `Name`.
+- **StaffRole**: `Name`.
 
-	class Country{ +int Id }
-	class Division{ +int Id }
-	class Estate{ +int Id }
-	class EstateType{ +int Id }
-	class EstateStatus{ +int Id }
-	class Staff{ +int Id }
-	class StaffRole{ +int Id }
-```
+If you'd like, I can add a PlantUML ERD or a graphical diagram and include it in this README.
 
-## Next steps
-- Add EF navigation properties if you want ORM-level relationships in code.
-- Generate a PNG/SVG diagram from the Mermaid block for documentation.
-
-This README can be extended with setup, build, and run instructions — tell me if you want that next.
