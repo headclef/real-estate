@@ -1,10 +1,10 @@
 using Realestate.Domain.Entities;
-using Realestate.Application.DTOs;
-namespace Realestate.Application.Mappings;
+using Realestate.Application.DTOs.Country;
+namespace Realestate.Application.Mappings.Country;
 
 public static class CountryMappingExtensions
 {
-    public static CountryDto ToDto(this Country src)
+    public static CountryDto ToDto(this Realestate.Domain.Entities.Country src)
     {
         if (src == null) return null!;
         return new CountryDto
@@ -20,10 +20,10 @@ public static class CountryMappingExtensions
         };
     }
 
-    public static Country ToEntity(this CreateCountryDto src)
+    public static Realestate.Domain.Entities.Country ToEntity(this CreateCountryDto src)
     {
         if (src == null) return null!;
-        return new Country
+        return new Realestate.Domain.Entities.Country
         {
             Name = src.Name,
             IsoTwo = src.IsoTwo,
@@ -35,7 +35,7 @@ public static class CountryMappingExtensions
         };
     }
 
-    public static void UpdateFrom(this Country target, UpdateCountryDto src)
+    public static void UpdateFrom(this Realestate.Domain.Entities.Country target, UpdateCountryDto src)
     {
         if (target == null || src == null) return;
         target.Name = src.Name;

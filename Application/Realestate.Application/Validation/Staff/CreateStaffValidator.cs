@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Realestate.Application.DTOs;
+using Realestate.Application.DTOs.Staff;
 using Realestate.Application.Wrappers;
 namespace Realestate.Application.Validation.Staff;
 

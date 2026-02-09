@@ -21,6 +21,18 @@ public class Response
     public static Response Ok(string? message = null)
         => new Response { Success = true, Message = message };
 
+    public static Response<T> Fail<T>(IEnumerable<string> errors, string? message = null, int? statusCode = null)
+        => new Response<T> { Success = false, Errors = errors?.ToList(), Message = message, StatusCode = statusCode };
+
+    public static Response<T> Fail<T>(string error, int? statusCode = null)
+        => Fail<T>(new[] { error }, null, statusCode);
+
+    public static Response<T> Ok<T>(T data, string? message = null)
+        => new Response<T> { Success = true, Data = data, Message = message };
+
+    public static Response<T> Ok<T>(string? message = null)
+        => new Response<T> { Success = true, Message = message };
+
     public static Response FromException(Exception ex, string? message = null, int? statusCode = 500)
         => new Response { Success = false, Message = message ?? ex.Message, Errors = new[] { ex.ToString() }, StatusCode = statusCode };
 }
@@ -32,13 +44,13 @@ public class Response<T> : Response
     public static Response<T> Ok(T data, string? message = null)
         => new Response<T> { Success = true, Data = data, Message = message };
 
-    public static Response<T> Ok(string? message = null)
+    public static new Response<T> Ok(string? message = null)
         => new Response<T> { Success = true, Message = message };
 
-    public static Response<T> Fail(IEnumerable<string> errors, string? message = null, int? statusCode = null)
+    public static new Response<T> Fail(IEnumerable<string> errors, string? message = null, int? statusCode = null)
         => new Response<T> { Success = false, Errors = errors?.ToList(), Message = message, StatusCode = statusCode };
 
-    public static Response<T> Fail(string error, int? statusCode = null)
+    public static new Response<T> Fail(string error, int? statusCode = null)
         => Fail(new[] { error }, null, statusCode);
 
     public static Response<T> FromException(Exception ex, int? statusCode = 500)

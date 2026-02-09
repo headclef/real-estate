@@ -1,4 +1,4 @@
-namespace Realestate.Application.DTOs;
+namespace Realestate.Application.DTOs.Country;
 
 public class CreateCountryDto
 {

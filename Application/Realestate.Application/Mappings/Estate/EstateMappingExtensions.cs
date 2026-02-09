@@ -1,10 +1,10 @@
 using Realestate.Domain.Entities;
-using Realestate.Application.DTOs;
-namespace Realestate.Application.Mappings;
+using Realestate.Application.DTOs.Estate;
+namespace Realestate.Application.Mappings.Estate;
 
 public static class EstateMappingExtensions
 {
-    public static EstateDto ToDto(this Estate src)
+    public static EstateDto ToDto(this Realestate.Domain.Entities.Estate src)
     {
         if (src == null) return null!;
         return new EstateDto
@@ -19,10 +19,10 @@ public static class EstateMappingExtensions
         };
     }
 
-    public static Estate ToEntity(this CreateEstateDto src)
+    public static Realestate.Domain.Entities.Estate ToEntity(this CreateEstateDto src)
     {
         if (src == null) return null!;
-        return new Estate
+        return new Realestate.Domain.Entities.Estate
         {
             Name = src.Name,
             Description = src.Description,
@@ -33,7 +33,7 @@ public static class EstateMappingExtensions
         };
     }
 
-    public static void UpdateFrom(this Estate target, UpdateEstateDto src)
+    public static void UpdateFrom(this Realestate.Domain.Entities.Estate target, UpdateEstateDto src)
     {
         if (target == null || src == null) return;
         target.Name = src.Name;

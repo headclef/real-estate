@@ -1,5 +1,5 @@
 using Realestate.Domain.Entities.Commons;
-namespace Realestate.Domain.Entities.Commons;
+namespace Realestate.Domain.Entities;
 
 public class Country : BaseEntity
 {

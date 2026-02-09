@@ -1,44 +1,41 @@
-# Real Estate
+# Real Estate project
 
-This repository contains the Real Estate project's domain and an initial application layer.
+This project is a modern Real Estate Management system built using Clean Architecture principles on .NET 8.
 
-Status: Scaffolded — domain entities and application-layer DTOs, interfaces, mappings, and validators have been added.
+## Project Structure
 
-Planned updates:
-- Project description
-- Development setup and prerequisites
-- Build and run instructions
-- Configuration (appsettings, secrets)
+The solution is divided into several layers to ensure separation of concerns and maintainability:
 
-**Entity Mapping**
+### 1. Core
+- **Realestate.Domain**: Contains the core domain entities (`Country`, `Estate`, `Staff`, etc.) and the `BaseEntity`.
+- **Realestate.Application**: Contains the business logic contracts, DTOs, service interfaces, repository interfaces, mappings, and validation logic.
 
-- **BaseEntity**: Id, IsDeleted, CreatedAt, UpdatedAt — base for all entities. See [Core/Realestate.Domain/Entities/Commons/BaseEntity.cs](Core/Realestate.Domain/Entities/Commons/BaseEntity.cs#L1).
-- **Estate**: Name, Description, Price, DivisionId, EstateTypeId, EstateStatusId — navigation to Division/EstateType/EstateStatus.
-- **Division**: Name, Code, CountryId, DivisionTypeId, ParentId (self-reference) — navigation to Country/DivisionType/ParentDivision.
-- **Staff**: Name, Surname, FullName, Code, Email, PhoneNumber, StaffRoleId — navigation to StaffRole.
-- **DivisionType**, **Country**, **EstateType**, **EstateStatus**, **StaffRole**: simple lookup entities (Name and metadata).
+### 2. Business
+- **Realestate.Business**: Contains the service implementations for the logic defined in the Application layer.
 
-**Application Layer (Core/Realestate.Application)**
+### 3. Infrastructure
+- **Realestate.persistence**: Implements the data access layer.
+    - **Hybrid Repository**: Uses **Entity Framework Core** for write operations (Add, Update, Delete) and **Dapper** for high-performance read operations (GetById, GetAll).
+    - **Soft Delete**: All entities inherit from `BaseEntity` and deletions are handled by setting `IsDeleted = true`. Global query filters exclude deleted records by default.
+    - **Contexts**: `ApplicationDbContext` handles EF configuration and audit fields.
 
-The application layer is organized per-entity under `Core/Realestate.Application` with the following structure for each entity:
+### 4. Web / Presentation
+- **Realestate.API**: A Web API entry point that exposes the application functionality to external consumers.
 
-- `DTOs/<Entity>`: `Create<...>Dto`, `Update<...>Dto`, `<Entity>Dto`.
-- `Interfaces/<Entity>`: service interface `I<Entity>Service` (CRUD methods returning `Response<T>`).
-- `Mappings/<Entity>`: mapping extension methods to convert between entities and DTOs.
-- `Validation/<Entity>`: simple create validators returning `Response<T>` with errors.
+## Features
+- **Clean Architecture**: Decoupled layers and dependency inversion.
+- **Hybrid Data Access**: Combines the productivity of EF Core with the performance of Dapper.
+- **Soft Deletes**: Automatic filtering of deleted records via the persistence layer.
+- **Audit Logs**: Automated `CreatedAt` and `UpdatedAt` tracking.
+- **Validation**: Per-entity validation using a consistent `Response` wrapper.
 
-Shared items:
-- `Wrappers/Response.cs`: generic `Response` and `Response<T>` wrapper used by service interfaces.
+## Technological Stack
+- **.NET 8.0**
+- **Entity Framework Core 8.0** (SQL Server)
+- **Dapper**
+- **Dependency Injection**
 
-Example folders added:
-- `DTOs/Estate`, `DTOs/Division`, `DTOs/Staff`, `DTOs/Country`, `DTOs/DivisionType`, `DTOs/EstateType`, `DTOs/EstateStatus`, `DTOs/StaffRole`
-- `Interfaces/Estate`, `Interfaces/Division`, `Interfaces/Staff`, `Interfaces/Country`, `Interfaces/DivisionType`, `Interfaces/EstateType`, `Interfaces/EstateStatus`, `Interfaces/StaffRole`
-- `Mappings/*`, `Validation/*` mirroring the above.
-
-Next steps (options):
-- Scaffold simple in-memory service implementations for each `I*Service`.
-- Add persistence (EF Core) repositories and wiring.
-- Generate a PlantUML ERD and place it in `docs/`.
-
-If you want one of those now, tell me which and I will implement it.
-
+## Getting Started
+1. Configure the connection string in `Web/Realestate.API/appsettings.json`.
+2. Run migrations (Planned).
+3. Start the API.
