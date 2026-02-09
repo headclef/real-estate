@@ -1,0 +1,75 @@
+# Visual Studio / .NET
+.vs/
+*.user
+*.userosscache
+*.suo
+*.unsuccessfulbuild
+*.userprefs
+*.rsuser
+
+# Build folders
+bin/
+obj/
+out/
+publish/
+
+# Visual Studio database files
+*.mdf
+*.ldf
+*.ndf
+
+# NuGet
+packages/
+*.nupkg
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+# Rider
+.idea/
+
+# Visual Studio Code workspace settings (optional)
+.vscode/
+
+# Logs and test results
+*.log
+logs/
+TestResults/
+coverage/
+coverage.*
+
+# Debug files
+*.pdb
+*.ilk
+*.cache
+
+# Publish output
+*.Publish.xml
+*.pubxml
+*.publishsettings
+
+# User-specific files
+*.sln.docstates
+
+# Local settings and secrets
+local.settings.json
+secrets.json
+secrets.*
+appsettings*.json
+appsettings.*.json
+.env
+
+# OS files
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Other
+*.vsix
+*.zip
+*.7z
