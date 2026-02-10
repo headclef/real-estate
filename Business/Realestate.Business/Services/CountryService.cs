@@ -2,13 +2,16 @@ using Realestate.Application.DTOs.Country;
 using Realestate.Application.Interfaces.Services.Country;
 using Realestate.Application.Interfaces.Repositories.Country;
 using Realestate.Application.Mappings.Country;
+using Realestate.Application.Validation.Country;
 using Realestate.Application.Wrappers;
-using Realestate.Domain.Entities;
+using Realestate.Domain.Entities.World;
 namespace Realestate.Business.Services;
 
 public class CountryService : ICountryService
 {
     private readonly ICountryRepository _countryRepository;
+    private readonly CreateCountryValidator _createValidator = new();
+    private readonly UpdateCountryValidator _updateValidator = new();
 
     public CountryService(ICountryRepository countryRepository)
     {
@@ -35,6 +38,10 @@ public class CountryService : ICountryService
 
     public async Task<Response<CountryDto>> CreateAsync(CreateCountryDto dto)
     {
+        var validation = _createValidator.Validate(dto);
+        if (!validation.IsSuccess)
+            return Response.Fail<CountryDto>(validation.Errors!, statusCode: 400);
+
         var entity = dto.ToEntity();
         await _countryRepository.AddAsync(entity);
         return Response.Ok(entity.ToDto(), "Country created successfully.");
@@ -42,6 +49,10 @@ public class CountryService : ICountryService
 
     public async Task<Response<CountryDto>> UpdateAsync(int id, UpdateCountryDto dto)
     {
+        var validation = _updateValidator.Validate(dto);
+        if (!validation.IsSuccess)
+            return Response.Fail<CountryDto>(validation.Errors!, statusCode: 400);
+
         var entity = await _countryRepository.GetByIdAsync(id);
         if (entity == null) return Response.Fail<CountryDto>("Country not found.");
 
