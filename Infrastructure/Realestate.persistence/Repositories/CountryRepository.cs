@@ -1,5 +1,5 @@
 using Realestate.Application.Interfaces.Repositories.Country;
-using Realestate.Domain.Entities;
+using Realestate.Domain.Entities.World;
 using Realestate.persistence.Contexts;
 namespace Realestate.persistence.Repositories;
 
