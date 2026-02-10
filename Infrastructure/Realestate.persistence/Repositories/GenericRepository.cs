@@ -16,9 +16,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         _dbContext = dbContext;
         _dbConnection = dbContext.Database.GetDbConnection();
-        _tableName = typeof(T).Name + "s"; // Simplified pluralization, adjust if necessary
-        // Note: For some entities like 'Country' it should be 'Countries', 
-        // we might need a more robust way to get table names if they don't follow 's' suffix.
+        _tableName = typeof(T).Name; // Simplified pluralization, adjust if necessary
+        // Note: We use entity type name as table name, ensure it matches your actual table names or implement a mapping strategy if needed.
     }
 
     public virtual async Task<T?> GetByIdAsync(int id)
