@@ -1,10 +1,10 @@
-using Realestate.Domain.Entities;
+using Realestate.Domain.Entities.Identity;
 using Realestate.Application.DTOs.Staff;
 namespace Realestate.Application.Mappings.Staff;
 
 public static class StaffMappingExtensions
 {
-    public static StaffDto ToDto(this Realestate.Domain.Entities.Staff src)
+    public static StaffDto ToDto(this Realestate.Domain.Entities.Identity.Staff src)
     {
         if (src == null) return null!;
         return new StaffDto
@@ -20,10 +20,10 @@ public static class StaffMappingExtensions
         };
     }
 
-    public static Realestate.Domain.Entities.Staff ToEntity(this CreateStaffDto src)
+    public static Realestate.Domain.Entities.Identity.Staff ToEntity(this CreateStaffDto src)
     {
         if (src == null) return null!;
-        return new Realestate.Domain.Entities.Staff
+        return new Realestate.Domain.Entities.Identity.Staff
         {
             Name = src.Name,
             Surname = src.Surname,
@@ -34,7 +34,7 @@ public static class StaffMappingExtensions
         };
     }
 
-    public static void UpdateFrom(this Realestate.Domain.Entities.Staff target, UpdateStaffDto src)
+    public static void UpdateFrom(this Realestate.Domain.Entities.Identity.Staff target, UpdateStaffDto src)
     {
         if (target == null || src == null) return;
         target.Name = src.Name;

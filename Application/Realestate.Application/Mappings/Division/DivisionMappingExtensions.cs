@@ -1,10 +1,10 @@
-using Realestate.Domain.Entities;
+using Realestate.Domain.Entities.World;
 using Realestate.Application.DTOs.Division;
 namespace Realestate.Application.Mappings.Division;
 
 public static class DivisionMappingExtensions
 {
-    public static DivisionDto ToDto(this Realestate.Domain.Entities.Division src)
+    public static DivisionDto ToDto(this Realestate.Domain.Entities.World.Division src)
     {
         if (src == null) return null!;
         return new DivisionDto
@@ -18,10 +18,10 @@ public static class DivisionMappingExtensions
         };
     }
 
-    public static Realestate.Domain.Entities.Division ToEntity(this CreateDivisionDto src)
+    public static Realestate.Domain.Entities.World.Division ToEntity(this CreateDivisionDto src)
     {
         if (src == null) return null!;
-        return new Realestate.Domain.Entities.Division
+        return new Realestate.Domain.Entities.World.Division
         {
             Name = src.Name,
             Code = src.Code,
@@ -31,7 +31,7 @@ public static class DivisionMappingExtensions
         };
     }
 
-    public static void UpdateFrom(this Realestate.Domain.Entities.Division target, UpdateDivisionDto src)
+    public static void UpdateFrom(this Realestate.Domain.Entities.World.Division target, UpdateDivisionDto src)
     {
         if (target == null || src == null) return;
         target.Name = src.Name;
