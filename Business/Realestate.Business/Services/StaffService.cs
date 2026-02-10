@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Realestate.Application.DTOs.Staff;
 using Realestate.Application.Interfaces;
 using Realestate.Application.Interfaces.Services.Staff;
@@ -9,18 +10,24 @@ namespace Realestate.Business.Services;
 public class StaffService : IStaffService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<StaffService> _logger;
     private readonly CreateStaffValidator _createValidator = new();
     private readonly UpdateStaffValidator _updateValidator = new();
 
-    public StaffService(IUnitOfWork unitOfWork)
+    public StaffService(IUnitOfWork unitOfWork, ILogger<StaffService> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<Response<StaffDto>> GetByIdAsync(int id)
     {
         var entity = await _unitOfWork.Staffs.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<StaffDto>("Staff not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("Staff with Id {StaffId} not found", id);
+            return Response.Fail<StaffDto>("Staff not found.");
+        }
         return Response.Ok(entity.ToDto());
     }
 
@@ -43,6 +50,7 @@ public class StaffService : IStaffService
         var entity = dto.ToEntity();
         await _unitOfWork.Staffs.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Staff created with Id {StaffId}", entity.Id);
         return Response.Ok(entity.ToDto(), "Staff created successfully.");
     }
 
@@ -53,22 +61,31 @@ public class StaffService : IStaffService
             return Response.Fail<StaffDto>(validation.Errors!, statusCode: 400);
 
         var entity = await _unitOfWork.Staffs.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<StaffDto>("Staff not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("Staff with Id {StaffId} not found for update", id);
+            return Response.Fail<StaffDto>("Staff not found.");
+        }
 
         entity.UpdateFrom(dto);
         await _unitOfWork.Staffs.UpdateAsync(entity);
         await _unitOfWork.SaveChangesAsync();
-
+        _logger.LogInformation("Staff with Id {StaffId} updated", id);
         return Response.Ok(entity.ToDto(), "Staff updated successfully.");
     }
 
     public async Task<Response<bool>> DeleteAsync(int id)
     {
         var entity = await _unitOfWork.Staffs.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<bool>("Staff not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("Staff with Id {StaffId} not found for deletion", id);
+            return Response.Fail<bool>("Staff not found.");
+        }
 
         await _unitOfWork.Staffs.DeleteAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Staff with Id {StaffId} soft-deleted", id);
         return Response.Ok(true, "Staff deleted successfully.");
     }
 }

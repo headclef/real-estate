@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Realestate.Application.DTOs.Estate;
 using Realestate.Application.Interfaces;
 using Realestate.Application.Interfaces.Services.Estate;
@@ -9,18 +10,24 @@ namespace Realestate.Business.Services;
 public class EstateService : IEstateService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<EstateService> _logger;
     private readonly CreateEstateValidator _createValidator = new();
     private readonly UpdateEstateValidator _updateValidator = new();
 
-    public EstateService(IUnitOfWork unitOfWork)
+    public EstateService(IUnitOfWork unitOfWork, ILogger<EstateService> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<Response<EstateDto>> GetByIdAsync(int id)
     {
         var entity = await _unitOfWork.Estates.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<EstateDto>("Estate not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("Estate with Id {EstateId} not found", id);
+            return Response.Fail<EstateDto>("Estate not found.");
+        }
         return Response.Ok(entity.ToDto());
     }
 
@@ -43,6 +50,7 @@ public class EstateService : IEstateService
         var entity = dto.ToEntity();
         await _unitOfWork.Estates.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Estate created with Id {EstateId}", entity.Id);
         return Response.Ok(entity.ToDto(), "Estate created successfully.");
     }
 
@@ -53,22 +61,31 @@ public class EstateService : IEstateService
             return Response.Fail<EstateDto>(validation.Errors!, statusCode: 400);
 
         var entity = await _unitOfWork.Estates.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<EstateDto>("Estate not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("Estate with Id {EstateId} not found for update", id);
+            return Response.Fail<EstateDto>("Estate not found.");
+        }
 
         entity.UpdateFrom(dto);
         await _unitOfWork.Estates.UpdateAsync(entity);
         await _unitOfWork.SaveChangesAsync();
-
+        _logger.LogInformation("Estate with Id {EstateId} updated", id);
         return Response.Ok(entity.ToDto(), "Estate updated successfully.");
     }
 
     public async Task<Response<bool>> DeleteAsync(int id)
     {
         var entity = await _unitOfWork.Estates.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<bool>("Estate not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("Estate with Id {EstateId} not found for deletion", id);
+            return Response.Fail<bool>("Estate not found.");
+        }
 
         await _unitOfWork.Estates.DeleteAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Estate with Id {EstateId} soft-deleted", id);
         return Response.Ok(true, "Estate deleted successfully.");
     }
 }

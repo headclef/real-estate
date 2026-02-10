@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Realestate.Application.DTOs.DivisionType;
 using Realestate.Application.Interfaces;
 using Realestate.Application.Interfaces.Services.DivisionType;
@@ -9,18 +10,24 @@ namespace Realestate.Business.Services;
 public class DivisionTypeService : IDivisionTypeService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<DivisionTypeService> _logger;
     private readonly CreateDivisionTypeValidator _createValidator = new();
     private readonly UpdateDivisionTypeValidator _updateValidator = new();
 
-    public DivisionTypeService(IUnitOfWork unitOfWork)
+    public DivisionTypeService(IUnitOfWork unitOfWork, ILogger<DivisionTypeService> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     public async Task<Response<DivisionTypeDto>> GetByIdAsync(int id)
     {
         var entity = await _unitOfWork.DivisionTypes.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<DivisionTypeDto>("DivisionType not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("DivisionType with Id {DivisionTypeId} not found", id);
+            return Response.Fail<DivisionTypeDto>("DivisionType not found.");
+        }
         return Response.Ok(entity.ToDto());
     }
 
@@ -43,6 +50,7 @@ public class DivisionTypeService : IDivisionTypeService
         var entity = dto.ToEntity();
         await _unitOfWork.DivisionTypes.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("DivisionType created with Id {DivisionTypeId}", entity.Id);
         return Response.Ok(entity.ToDto(), "DivisionType created successfully.");
     }
 
@@ -53,22 +61,31 @@ public class DivisionTypeService : IDivisionTypeService
             return Response.Fail<DivisionTypeDto>(validation.Errors!, statusCode: 400);
 
         var entity = await _unitOfWork.DivisionTypes.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<DivisionTypeDto>("DivisionType not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("DivisionType with Id {DivisionTypeId} not found for update", id);
+            return Response.Fail<DivisionTypeDto>("DivisionType not found.");
+        }
 
         entity.UpdateFrom(dto);
         await _unitOfWork.DivisionTypes.UpdateAsync(entity);
         await _unitOfWork.SaveChangesAsync();
-
+        _logger.LogInformation("DivisionType with Id {DivisionTypeId} updated", id);
         return Response.Ok(entity.ToDto(), "DivisionType updated successfully.");
     }
 
     public async Task<Response<bool>> DeleteAsync(int id)
     {
         var entity = await _unitOfWork.DivisionTypes.GetByIdAsync(id);
-        if (entity == null) return Response.Fail<bool>("DivisionType not found.");
+        if (entity == null)
+        {
+            _logger.LogWarning("DivisionType with Id {DivisionTypeId} not found for deletion", id);
+            return Response.Fail<bool>("DivisionType not found.");
+        }
 
         await _unitOfWork.DivisionTypes.DeleteAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("DivisionType with Id {DivisionTypeId} soft-deleted", id);
         return Response.Ok(true, "DivisionType deleted successfully.");
     }
 }

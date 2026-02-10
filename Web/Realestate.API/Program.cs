@@ -1,3 +1,4 @@
+using System.Reflection;
 using Serilog;
 using Realestate.persistence.Registration;
 using Realestate.Business.Registration;
@@ -17,7 +18,19 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Real Estate API",
+        Version = "v1",
+        Description = "Clean Architecture Real Estate Management API — World, Property & Identity domains."
+    });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
 
 // CORS
 builder.Services.AddCors(options =>
