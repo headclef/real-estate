@@ -1,4 +1,5 @@
 using Realestate.Domain.Entities.Commons;
+using Realestate.Domain.Entities.World;
 namespace Realestate.Domain.Entities.Property;
 
 /// <summary>
