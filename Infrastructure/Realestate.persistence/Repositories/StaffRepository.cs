@@ -16,9 +16,13 @@ public class StaffRepository : GenericRepository<Staff>, IStaffRepository
     {
         _connection = dbContext.Database.GetDbConnection();
         var entityType = dbContext.Model.FindEntityType(typeof(Staff));
-        var schema = entityType?.GetSchema() ?? "Identity";
+        var schema = entityType?.GetSchema();
         var table = entityType?.GetTableName() ?? "Staff";
-        _table = $"[{schema}].[{table}]";
+
+        var isSqlite = dbContext.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true;
+        _table = isSqlite || string.IsNullOrEmpty(schema)
+            ? $"\"{table}\""
+            : $"[{schema}].[{table}]";
     }
 
     public async Task<Staff?> GetByEmailAsync(string email)

@@ -19,9 +19,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
         // Resolve [Schema].[Table] from the EF model so Dapper queries match the fluent config
         var entityType = dbContext.Model.FindEntityType(typeof(T));
-        var schema = entityType?.GetSchema() ?? "dbo";
+        var schema = entityType?.GetSchema();
         var table = entityType?.GetTableName() ?? typeof(T).Name;
-        _qualifiedTableName = $"[{schema}].[{table}]";
+
+        // SQLite does not support schemas — use plain table name
+        var isSqlite = dbContext.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true;
+        _qualifiedTableName = isSqlite || string.IsNullOrEmpty(schema)
+            ? $"\"{table}\""
+            : $"[{schema}].[{table}]";
     }
 
     // ────── Dapper Reads ──────
