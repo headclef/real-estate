@@ -1,6 +1,9 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Realestate.Domain.Entities;
 using Realestate.Domain.Entities.Commons;
+using Realestate.Domain.Entities.World;
+using Realestate.Domain.Entities.Property;
+using Realestate.Domain.Entities.Identity;
 namespace Realestate.persistence.Contexts;
 
 public class ApplicationDbContext : DbContext
@@ -9,18 +12,26 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    // World
     public DbSet<Country> Countries { get; set; }
     public DbSet<Division> Divisions { get; set; }
     public DbSet<DivisionType> DivisionTypes { get; set; }
+
+    // Property
     public DbSet<Estate> Estates { get; set; }
     public DbSet<EstateStatus> EstateStatuses { get; set; }
     public DbSet<EstateType> EstateTypes { get; set; }
+
+    // Identity
     public DbSet<Staff> Staffs { get; set; }
     public DbSet<StaffRole> StaffRoles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Apply all IEntityTypeConfiguration<T> from this assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         // Global Query Filter for Soft Delete
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
