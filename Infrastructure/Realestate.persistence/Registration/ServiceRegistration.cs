@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Realestate.Application.Interfaces;
 using Realestate.Application.Interfaces.Repositories;
 using Realestate.Application.Interfaces.Repositories.Country;
 using Realestate.Application.Interfaces.Repositories.Division;
@@ -22,6 +23,10 @@ public static class ServiceRegistration
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+
+        #region Unit of Work
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        #endregion
 
         #region Repositories
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

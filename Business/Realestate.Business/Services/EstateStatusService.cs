@@ -1,6 +1,6 @@
 using Realestate.Application.DTOs.EstateStatus;
+using Realestate.Application.Interfaces;
 using Realestate.Application.Interfaces.Services.EstateStatus;
-using Realestate.Application.Interfaces.Repositories.EstateStatus;
 using Realestate.Application.Mappings.EstateStatus;
 using Realestate.Application.Validation.EstateStatus;
 using Realestate.Application.Wrappers;
@@ -8,25 +8,25 @@ namespace Realestate.Business.Services;
 
 public class EstateStatusService : IEstateStatusService
 {
-    private readonly IEstateStatusRepository _estateStatusRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly CreateEstateStatusValidator _createValidator = new();
     private readonly UpdateEstateStatusValidator _updateValidator = new();
 
-    public EstateStatusService(IEstateStatusRepository estateStatusRepository)
+    public EstateStatusService(IUnitOfWork unitOfWork)
     {
-        _estateStatusRepository = estateStatusRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Response<EstateStatusDto>> GetByIdAsync(int id)
     {
-        var entity = await _estateStatusRepository.GetByIdAsync(id);
+        var entity = await _unitOfWork.EstateStatuses.GetByIdAsync(id);
         if (entity == null) return Response.Fail<EstateStatusDto>("EstateStatus not found.");
         return Response.Ok(entity.ToDto());
     }
 
     public async Task<PagedResponse<EstateStatusDto>> ListAsync(int page = 1, int pageSize = 20)
     {
-        var entities = await _estateStatusRepository.GetAllAsync();
+        var entities = await _unitOfWork.EstateStatuses.GetAllAsync();
         var dtos = entities.Select(e => e.ToDto()).ToList();
 
         var pagedData = dtos.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -41,7 +41,8 @@ public class EstateStatusService : IEstateStatusService
             return Response.Fail<EstateStatusDto>(validation.Errors!, statusCode: 400);
 
         var entity = dto.ToEntity();
-        await _estateStatusRepository.AddAsync(entity);
+        await _unitOfWork.EstateStatuses.AddAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
         return Response.Ok(entity.ToDto(), "EstateStatus created successfully.");
     }
 
@@ -51,21 +52,23 @@ public class EstateStatusService : IEstateStatusService
         if (!validation.IsSuccess)
             return Response.Fail<EstateStatusDto>(validation.Errors!, statusCode: 400);
 
-        var entity = await _estateStatusRepository.GetByIdAsync(id);
+        var entity = await _unitOfWork.EstateStatuses.GetByIdAsync(id);
         if (entity == null) return Response.Fail<EstateStatusDto>("EstateStatus not found.");
 
         entity.UpdateFrom(dto);
-        await _estateStatusRepository.UpdateAsync(entity);
+        await _unitOfWork.EstateStatuses.UpdateAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
 
         return Response.Ok(entity.ToDto(), "EstateStatus updated successfully.");
     }
 
     public async Task<Response<bool>> DeleteAsync(int id)
     {
-        var entity = await _estateStatusRepository.GetByIdAsync(id);
+        var entity = await _unitOfWork.EstateStatuses.GetByIdAsync(id);
         if (entity == null) return Response.Fail<bool>("EstateStatus not found.");
 
-        await _estateStatusRepository.DeleteAsync(entity);
+        await _unitOfWork.EstateStatuses.DeleteAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
         return Response.Ok(true, "EstateStatus deleted successfully.");
     }
 }

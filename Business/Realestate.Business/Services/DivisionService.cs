@@ -1,6 +1,6 @@
 using Realestate.Application.DTOs.Division;
+using Realestate.Application.Interfaces;
 using Realestate.Application.Interfaces.Services.Division;
-using Realestate.Application.Interfaces.Repositories.Division;
 using Realestate.Application.Mappings.Division;
 using Realestate.Application.Validation.Division;
 using Realestate.Application.Wrappers;
@@ -8,25 +8,25 @@ namespace Realestate.Business.Services;
 
 public class DivisionService : IDivisionService
 {
-    private readonly IDivisionRepository _divisionRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly CreateDivisionValidator _createValidator = new();
     private readonly UpdateDivisionValidator _updateValidator = new();
 
-    public DivisionService(IDivisionRepository divisionRepository)
+    public DivisionService(IUnitOfWork unitOfWork)
     {
-        _divisionRepository = divisionRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Response<DivisionDto>> GetByIdAsync(int id)
     {
-        var entity = await _divisionRepository.GetByIdAsync(id);
+        var entity = await _unitOfWork.Divisions.GetByIdAsync(id);
         if (entity == null) return Response.Fail<DivisionDto>("Division not found.");
         return Response.Ok(entity.ToDto());
     }
 
     public async Task<PagedResponse<DivisionDto>> ListAsync(int page = 1, int pageSize = 20)
     {
-        var entities = await _divisionRepository.GetAllAsync();
+        var entities = await _unitOfWork.Divisions.GetAllAsync();
         var dtos = entities.Select(e => e.ToDto()).ToList();
 
         var pagedData = dtos.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -41,7 +41,8 @@ public class DivisionService : IDivisionService
             return Response.Fail<DivisionDto>(validation.Errors!, statusCode: 400);
 
         var entity = dto.ToEntity();
-        await _divisionRepository.AddAsync(entity);
+        await _unitOfWork.Divisions.AddAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
         return Response.Ok(entity.ToDto(), "Division created successfully.");
     }
 
@@ -51,21 +52,23 @@ public class DivisionService : IDivisionService
         if (!validation.IsSuccess)
             return Response.Fail<DivisionDto>(validation.Errors!, statusCode: 400);
 
-        var entity = await _divisionRepository.GetByIdAsync(id);
+        var entity = await _unitOfWork.Divisions.GetByIdAsync(id);
         if (entity == null) return Response.Fail<DivisionDto>("Division not found.");
 
         entity.UpdateFrom(dto);
-        await _divisionRepository.UpdateAsync(entity);
+        await _unitOfWork.Divisions.UpdateAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
 
         return Response.Ok(entity.ToDto(), "Division updated successfully.");
     }
 
     public async Task<Response<bool>> DeleteAsync(int id)
     {
-        var entity = await _divisionRepository.GetByIdAsync(id);
+        var entity = await _unitOfWork.Divisions.GetByIdAsync(id);
         if (entity == null) return Response.Fail<bool>("Division not found.");
 
-        await _divisionRepository.DeleteAsync(entity);
+        await _unitOfWork.Divisions.DeleteAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
         return Response.Ok(true, "Division deleted successfully.");
     }
 }
