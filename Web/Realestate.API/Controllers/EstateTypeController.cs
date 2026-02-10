@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Realestate.Application.DTOs.EstateType;
 using Realestate.Application.Interfaces.Services.EstateType;
@@ -8,6 +9,7 @@ namespace Realestate.API.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [Tags("Property")]
+[Authorize]
 public class EstateTypeController : ApiBaseController
 {
     private readonly IEstateTypeService _estateTypeService;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Realestate.Application.DTOs.StaffRole;
 using Realestate.Application.Interfaces.Services.StaffRole;
@@ -8,6 +9,7 @@ namespace Realestate.API.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [Tags("Identity")]
+[Authorize]
 public class StaffRoleController : ApiBaseController
 {
     private readonly IStaffRoleService _staffRoleService;

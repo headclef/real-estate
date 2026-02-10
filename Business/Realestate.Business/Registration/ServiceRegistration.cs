@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Realestate.Application.Interfaces.Services.Auth;
 using Realestate.Application.Interfaces.Services.Country;
 using Realestate.Application.Interfaces.Services.Division;
 using Realestate.Application.Interfaces.Services.DivisionType;
@@ -14,6 +15,9 @@ public static class ServiceRegistration
 {
     public static void AddBusinessLayer(this IServiceCollection services)
     {
+        // Auth
+        services.AddScoped<IAuthService, AuthService>();
+
         // World
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<IDivisionTypeService, DivisionTypeService>();

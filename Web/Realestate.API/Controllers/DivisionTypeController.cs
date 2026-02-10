@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Realestate.Application.DTOs.DivisionType;
 using Realestate.Application.Interfaces.Services.DivisionType;
@@ -8,6 +9,7 @@ namespace Realestate.API.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [Tags("World")]
+[Authorize]
 public class DivisionTypeController : ApiBaseController
 {
     private readonly IDivisionTypeService _divisionTypeService;
