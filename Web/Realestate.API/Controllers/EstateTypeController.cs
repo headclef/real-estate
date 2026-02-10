@@ -7,7 +7,6 @@ namespace Realestate.API.Controllers;
 /// <summary>
 /// Manages estate types — Apartment, Villa, Land, etc. (Property schema).
 /// </summary>
-[Route("api/[controller]")]
 [Tags("Property")]
 [Authorize]
 public class EstateTypeController : ApiBaseController

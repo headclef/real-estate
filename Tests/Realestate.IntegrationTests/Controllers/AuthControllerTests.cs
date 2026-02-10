@@ -28,7 +28,7 @@ public class AuthControllerTests : IClassFixture<RealEstateWebAppFactory>
             StaffRoleId = 1
         };
 
-        var response = await _client.PostAsJsonAsync("/api/auth/register", dto);
+        var response = await _client.PostAsJsonAsync("/api/v0/auth/register", dto);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<Response<TokenResponseDto>>();
@@ -47,10 +47,10 @@ public class AuthControllerTests : IClassFixture<RealEstateWebAppFactory>
         };
 
         // First registration
-        await _client.PostAsJsonAsync("/api/auth/register", dto);
+        await _client.PostAsJsonAsync("/api/v0/auth/register", dto);
 
         // Second — duplicate
-        var response = await _client.PostAsJsonAsync("/api/auth/register", dto);
+        var response = await _client.PostAsJsonAsync("/api/v0/auth/register", dto);
 
         // 409 wrapped through ApiResponse, check not success
         var body = await response.Content.ReadFromJsonAsync<Response<TokenResponseDto>>();
@@ -66,7 +66,7 @@ public class AuthControllerTests : IClassFixture<RealEstateWebAppFactory>
             Password = "Pass123", ConfirmPassword = "Wrong", StaffRoleId = 1
         };
 
-        var response = await _client.PostAsJsonAsync("/api/auth/register", dto);
+        var response = await _client.PostAsJsonAsync("/api/v0/auth/register", dto);
 
         var body = await response.Content.ReadFromJsonAsync<Response<TokenResponseDto>>();
         Assert.False(body!.Success);
@@ -79,13 +79,13 @@ public class AuthControllerTests : IClassFixture<RealEstateWebAppFactory>
     {
         // Register a user first
         var email = $"login{Guid.NewGuid():N}@example.com";
-        await _client.PostAsJsonAsync("/api/auth/register", new RegisterDto
+        await _client.PostAsJsonAsync("/api/v0/auth/register", new RegisterDto
         {
             Name = "Login", Surname = "Test", Email = email,
             Password = "Pass123", ConfirmPassword = "Pass123", StaffRoleId = 1
         });
 
-        var response = await _client.PostAsJsonAsync("/api/auth/login",
+        var response = await _client.PostAsJsonAsync("/api/v0/auth/login",
             new LoginDto { Email = email, Password = "Pass123" });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -98,13 +98,13 @@ public class AuthControllerTests : IClassFixture<RealEstateWebAppFactory>
     public async Task Login_WrongPassword_ReturnsUnauthorized()
     {
         var email = $"wrong{Guid.NewGuid():N}@example.com";
-        await _client.PostAsJsonAsync("/api/auth/register", new RegisterDto
+        await _client.PostAsJsonAsync("/api/v0/auth/register", new RegisterDto
         {
             Name = "A", Surname = "B", Email = email,
             Password = "Pass123", ConfirmPassword = "Pass123", StaffRoleId = 1
         });
 
-        var response = await _client.PostAsJsonAsync("/api/auth/login",
+        var response = await _client.PostAsJsonAsync("/api/v0/auth/login",
             new LoginDto { Email = email, Password = "WrongPass" });
 
         var body = await response.Content.ReadFromJsonAsync<Response<TokenResponseDto>>();
@@ -114,7 +114,7 @@ public class AuthControllerTests : IClassFixture<RealEstateWebAppFactory>
     [Fact]
     public async Task Login_NonExistentEmail_ReturnsUnauthorized()
     {
-        var response = await _client.PostAsJsonAsync("/api/auth/login",
+        var response = await _client.PostAsJsonAsync("/api/v0/auth/login",
             new LoginDto { Email = "nope@example.com", Password = "Pass" });
 
         var body = await response.Content.ReadFromJsonAsync<Response<TokenResponseDto>>();

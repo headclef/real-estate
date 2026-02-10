@@ -7,7 +7,6 @@ namespace Realestate.API.Controllers;
 /// <summary>
 /// Manages division types — Province, District, Neighborhood, etc. (World schema).
 /// </summary>
-[Route("api/[controller]")]
 [Tags("World")]
 [Authorize]
 public class DivisionTypeController : ApiBaseController

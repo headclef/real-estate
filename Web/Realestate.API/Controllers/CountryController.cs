@@ -7,7 +7,6 @@ namespace Realestate.API.Controllers;
 /// <summary>
 /// Manages countries (World schema).
 /// </summary>
-[Route("api/[controller]")]
 [Tags("World")]
 [Authorize]
 public class CountryController : ApiBaseController

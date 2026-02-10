@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -48,15 +49,29 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.SwaggerDoc("v0", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "Real Estate API",
-        Version = "v1",
+        Version = "v0",
         Description = "Clean Architecture Real Estate Management API — World, Property & Identity domains."
     });
 
@@ -104,7 +119,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v0/swagger.json", "Real Estate API v0");
+    });
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

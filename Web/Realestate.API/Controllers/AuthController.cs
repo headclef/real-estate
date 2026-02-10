@@ -7,7 +7,6 @@ namespace Realestate.API.Controllers;
 /// <summary>
 /// Authentication endpoints — login &amp; registration.
 /// </summary>
-[Route("api/[controller]")]
 [Tags("Auth")]
 public class AuthController : ApiBaseController
 {

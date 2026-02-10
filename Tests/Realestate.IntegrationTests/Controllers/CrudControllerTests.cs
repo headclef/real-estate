@@ -18,7 +18,7 @@ public class CrudControllerTests : IClassFixture<RealEstateWebAppFactory>
     private async Task<string> GetTokenAsync()
     {
         var email = $"crud{Guid.NewGuid():N}@example.com";
-        var reg = await _client.PostAsJsonAsync("/api/auth/register", new RegisterDto
+        var reg = await _client.PostAsJsonAsync("/api/v0/auth/register", new RegisterDto
         {
             Name = "Crud", Surname = "Tester", Email = email,
             Password = "Pass123", ConfirmPassword = "Pass123", StaffRoleId = 1
@@ -40,7 +40,7 @@ public class CrudControllerTests : IClassFixture<RealEstateWebAppFactory>
     public async Task Country_GetAll_WithoutToken_Returns401()
     {
         var client = new RealEstateWebAppFactory().CreateClient();
-        var response = await client.GetAsync("/api/country");
+        var response = await client.GetAsync("/api/v0/country");
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -54,7 +54,7 @@ public class CrudControllerTests : IClassFixture<RealEstateWebAppFactory>
 
         // Create
         var createDto = new CreateCountryDto { Name = "TestLand", IsoTwo = "TL" };
-        var createResp = await client.PostAsJsonAsync("/api/country", createDto);
+        var createResp = await client.PostAsJsonAsync("/api/v0/country", createDto);
         Assert.True(createResp.IsSuccessStatusCode);
         var created = await createResp.Content.ReadFromJsonAsync<Response<CountryDto>>();
         Assert.True(created!.Success);
@@ -62,26 +62,26 @@ public class CrudControllerTests : IClassFixture<RealEstateWebAppFactory>
         Assert.True(id > 0);
 
         // GetById
-        var getResp = await client.GetAsync($"/api/country/{id}");
+        var getResp = await client.GetAsync($"/api/v0/country/{id}");
         Assert.True(getResp.IsSuccessStatusCode);
         var fetched = await getResp.Content.ReadFromJsonAsync<Response<CountryDto>>();
         Assert.Equal("TestLand", fetched!.Data!.Name);
 
         // Update
         var updateDto = new UpdateCountryDto { Name = "UpdatedLand", IsoTwo = "UL" };
-        var updateResp = await client.PutAsJsonAsync($"/api/country/{id}", updateDto);
+        var updateResp = await client.PutAsJsonAsync($"/api/v0/country/{id}", updateDto);
         Assert.True(updateResp.IsSuccessStatusCode);
         var updated = await updateResp.Content.ReadFromJsonAsync<Response<CountryDto>>();
         Assert.Equal("UpdatedLand", updated!.Data!.Name);
 
         // Delete (soft)
-        var deleteResp = await client.DeleteAsync($"/api/country/{id}");
+        var deleteResp = await client.DeleteAsync($"/api/v0/country/{id}");
         Assert.True(deleteResp.IsSuccessStatusCode);
         var deleted = await deleteResp.Content.ReadFromJsonAsync<Response<bool>>();
         Assert.True(deleted!.Data);
 
         // After soft delete, GetById should fail
-        var afterDelete = await client.GetAsync($"/api/country/{id}");
+        var afterDelete = await client.GetAsync($"/api/v0/country/{id}");
         var afterBody = await afterDelete.Content.ReadFromJsonAsync<Response<CountryDto>>();
         Assert.False(afterBody!.Success);
     }
@@ -94,10 +94,10 @@ public class CrudControllerTests : IClassFixture<RealEstateWebAppFactory>
         var client = await AuthenticatedClientAsync();
 
         // Create a couple
-        await client.PostAsJsonAsync("/api/country", new CreateCountryDto { Name = "Alpha", IsoTwo = "AA" });
-        await client.PostAsJsonAsync("/api/country", new CreateCountryDto { Name = "Beta", IsoTwo = "BB" });
+        await client.PostAsJsonAsync("/api/v0/country", new CreateCountryDto { Name = "Alpha", IsoTwo = "AA" });
+        await client.PostAsJsonAsync("/api/v0/country", new CreateCountryDto { Name = "Beta", IsoTwo = "BB" });
 
-        var response = await client.GetAsync("/api/country?page=1&pageSize=50");
+        var response = await client.GetAsync("/api/v0/country?page=1&pageSize=50");
         Assert.True(response.IsSuccessStatusCode);
     }
 }

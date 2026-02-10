@@ -7,7 +7,6 @@ namespace Realestate.API.Controllers;
 /// <summary>
 /// Manages staff members (Identity schema).
 /// </summary>
-[Route("api/[controller]")]
 [Tags("Identity")]
 [Authorize]
 public class StaffController : ApiBaseController

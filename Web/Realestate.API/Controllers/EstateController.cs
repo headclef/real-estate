@@ -7,7 +7,6 @@ namespace Realestate.API.Controllers;
 /// <summary>
 /// Manages real-estate listings (Property schema).
 /// </summary>
-[Route("api/[controller]")]
 [Tags("Property")]
 [Authorize]
 public class EstateController : ApiBaseController

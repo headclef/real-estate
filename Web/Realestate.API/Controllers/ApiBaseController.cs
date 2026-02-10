@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Realestate.Application.Wrappers;
 namespace Realestate.API.Controllers;
@@ -7,6 +8,8 @@ namespace Realestate.API.Controllers;
 /// All API controllers should inherit from this instead of <see cref="ControllerBase"/>.
 /// </summary>
 [ApiController]
+[ApiVersion(0)]
+[Route("api/v{version:apiVersion}/[controller]")]
 public abstract class ApiBaseController : ControllerBase
 {
     /// <summary>
