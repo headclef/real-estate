@@ -48,12 +48,26 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public Task UpdateAsync(T entity)
     {
+        // Dapper-returned entities are untracked — Attach first, then mark modified.
+        var tracked = _dbContext.ChangeTracker.Entries<T>()
+            .FirstOrDefault(e => e.Entity.Id == entity.Id);
+
+        if (tracked == null)
+            _dbContext.Set<T>().Attach(entity);
+
         _dbContext.Entry(entity).State = EntityState.Modified;
         return Task.CompletedTask;
     }
 
     public Task DeleteAsync(T entity)
     {
+        // Soft delete — attach if untracked, then mark the row as modified.
+        var tracked = _dbContext.ChangeTracker.Entries<T>()
+            .FirstOrDefault(e => e.Entity.Id == entity.Id);
+
+        if (tracked == null)
+            _dbContext.Set<T>().Attach(entity);
+
         entity.IsDeleted = true;
         _dbContext.Entry(entity).State = EntityState.Modified;
         return Task.CompletedTask;
